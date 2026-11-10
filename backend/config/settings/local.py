@@ -43,6 +43,7 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER":"shared.exceptions.handler.custom_exception_handler"
 }
 MIDDLEWARE = [
+    "shared.middleware.request_id.RequestIDMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -51,7 +52,34 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "request_id": {
+            "()": "shared.logging.filters.RequestIDFilter",
+        },
+    },
+    "formatters": {
+        "standard": {
+            "format": (
+                "%(asctime)s | %(levelname)s | %(name)s | "
+                "request_id=%(request_id)s | %(message)s"
+            ),
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "filters": ["request_id"],
+            "formatter": "standard",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+}
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
